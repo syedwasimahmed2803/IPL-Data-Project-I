@@ -1,4 +1,4 @@
-const matches = require("..//data/matches")
+const matches = require("../data/matches")
 const fs = require('fs');
 
 function matchesWon(object){
@@ -18,6 +18,6 @@ for(let key of object){
 return newObj;
 }
 fs.writeFileSync(
-    "../public/output/2-matches-won-per-team-per-year.json",
-    JSON.stringify(matchesWon(matches))
+    "../public/output/matchesWonPerYearPerTeam.json",
+    JSON.stringify(matchesWon(matches),null,2)
   );

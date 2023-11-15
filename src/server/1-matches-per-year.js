@@ -12,7 +12,7 @@ function matchesPerYear(object){
     return newObj;
 }
 fs.writeFileSync(
-    "../public/output/1-matches-per-year.json",
-    JSON.stringify(matchesPerYear(matches))
+    "../public/output/matchesPerYear.json",
+    JSON.stringify(matchesPerYear(matches),null,2)
   );
 // console.log(matchesPerYear(obj));

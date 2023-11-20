@@ -1,26 +1,16 @@
-const matches = require("../data/matches")
-const fs = require("fs")
+function playerOfTheMatch(matches) {
+  const playerData = matches.reduce((acc, match) => {
+    const { season, player_of_match } = match;
+    acc[season] = acc[season] || {};
+    acc[season][player_of_match] = (acc[season][player_of_match] || 0) + 1;
+    return acc;
+  }, {});
 
-function playerOfTheMatch(match1){
-   const playerOfMatch = match1.reduce((acc,curr)=>{
-    const{season, player_of_match} = curr;
-    if(!acc[season]){
-        acc[season]={}
-    }
-    if(!acc[season][player_of_match]){
-        acc[season][player_of_match]=0;
-    }
-    acc[season][player_of_match]++
-    return acc
-   },{})
-   const years = Object.keys(playerOfMatch);
-   const sortedData = [];
-   for (const year of years) {
-     const sortedEntry = Object.entries(playerOfMatch[year]).sort(([,a],[,b])=>b-a)
-     const [player] = sortedEntry[0]
-     sortedData.push({year, player})
+  const sortData = Object.entries(playerData).map(([year, data]) => {
+    const sortEntry = Object.entries(data).sort(([, a], [, b]) => b - a);
+    const [player] = sortEntry[0];
+    return { year, player };
+  });
+  return sortData;
 }
-return sortedData;
-}
-console.log(playerOfTheMatch(matches))
-fs.writeFileSync("../public/output/playerOfTheGame.json",JSON.stringify(playerOfTheMatch(matches),null,2));
+module.exports.playerOfTheMatch = playerOfTheMatch;

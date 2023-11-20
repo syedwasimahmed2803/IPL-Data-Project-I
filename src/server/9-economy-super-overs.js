@@ -1,28 +1,19 @@
-const deliveries = require('../data/deliveries')
-const fs = require("fs")
-
-function economySuperOvers(deliveries1){
-    let nObj={}
-    deliveries1.forEach(element => {
-        if(element["is_super_over"]=="1"){
-            if(!nObj[element["bowler"]]){
-            nObj[element["bowler"]]={runs:0,balls:0}
-        }
-        nObj[element["bowler"]].runs+=parseInt(element["total_runs"])
-        nObj[element["bowler"]].balls+=1
-    }
-    });
-
-let bowlerArray = []
-for(let Bowler in nObj){
-    let runs = nObj[Bowler].runs;
-    let balls = nObj[Bowler].balls;
-    let economy = (runs/balls)*6;
-    bowlerArray.push({Bowler, economy})
+function superOverEconomy(deliveries) {
+  const bowlerData = deliveries
+    .filter((deliveries) => deliveries.is_super_over == "1")
+    .reduce((acc, delivery) => {
+      acc[delivery.bowler] = acc[delivery.bowler] ?? { runs: 0, balls: 0 };
+      acc[delivery.bowler].runs += parseInt(delivery.total_runs);
+      acc[delivery.bowler].balls += 1;
+      return acc;
+    }, {});
+  let ecobowler = Object.entries(bowlerData).map(([bowler, data]) => {
+    let run = data.runs;
+    let ball = data.balls;
+    let economy = (run / ball) * 6;
+    return { bowler, economy: economy.toFixed(2) };
+  });
+  ecobowler.sort((a, b) => a.economy - b.economy);
+  return ecobowler.slice(0, 1);
 }
-bowlerArray.sort((a, b) => a.economy - b.economy);
-const topBowler = bowlerArray.slice(0, 1);
-
-console.log(topBowler);
-}
-fs.writeFileSync("../public/output/economySuperOvers.json",JSON.stringify(economySuperOvers(deliveries),null,2));
+module.exports.superOverEconomy = superOverEconomy;

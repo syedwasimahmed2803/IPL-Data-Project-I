@@ -1,42 +1,34 @@
-const matches = require("../data/matches")
-const deliveries = require("../data/deliveries")
-const fs = require('fs');
+function strikeRate(matches, deliveries) {
+  const matchId = matches.reduce((acc, match) => {
+    acc[match.id] = match;
+    return acc;
+  }, {});
+  const playerData = deliveries.reduce((acc, delivery) => {
+    const { batsman, batsman_runs, wide_runs, noball_runs, match_id } =
+      delivery;
+    const isWide = parseInt(wide_runs > 0);
+    const isNoBall = parseInt(noball_runs > 0);
 
-
-function strikeRate(matches1, deliveries1){
-    let newArr=[];
-    let seasonObj={};
-    let nObj={};
-    for(let index=0;index<matches1.length;index++){
-        let eachMatch = matches1[index]
-        if(!seasonObj[eachMatch["season"]]){
-            seasonObj[eachMatch["season"]]={}
-        }
+    if (batsman === "KL Rahul" && matchId[match_id]) {
+      const season = matchId[match_id].season;
+      acc[season] = acc[season] || { runs: 0, balls: 0 };
+      if (!isNoBall && !isWide) {
+        acc[season].runs += parseInt(batsman_runs);
+        acc[season].balls += 1;
+      }
     }
-return seasonObj
-    // for(let index=0;index<deliveries1.length;index++){
-    //     let eachDelivery = deliveries1[index]
-    //     for(let i=0;i<newArr.length;i++){
-    //         let eachId=newArr[i]
-    //         if(eachDelivery["match_id"]==eachId){
-    //         if(eachDelivery["batsman"]=="GJ Maxwell"){
-    //             if(!nObj[eachDelivery["batsman"]]){
-    //                 nObj[eachDelivery["batsman"]]={runs:0, balls:0};
-    //             }
-    //             nObj[eachDelivery["batsman"]].runs+=parseInt(eachDelivery["total_runs"])
-    //             nObj[eachDelivery["batsman"]].balls+=1;
-    //         }
-    //         }
-    //     }
-    // }
-    // let strikeRateArray =0
-    // for(let batsman in nObj){
+    return acc;
+  }, {});
 
-    // }
-    // return nObj
+  const playerStrikeRateData = Object.entries(playerData).reduce(
+    (acc, [season, { runs, balls }]) => {
+      const strikeRate = ((runs / balls) * 100).toFixed(2);
+      acc[season] = parseFloat(strikeRate);
+      return acc;
+    },
+    {}
+  );
+  return playerStrikeRateData;
 }
-    
-console.log(strikeRate(matches, deliveries))
-    
 
-// fs.writeFileSync("../public/output/strikeRate.json",JSON.stringify(strikeRate(matches, deliveries),null,2));
+module.exports.strikeRate = strikeRate;

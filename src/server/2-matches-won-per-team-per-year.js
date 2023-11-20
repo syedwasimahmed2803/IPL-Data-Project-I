@@ -1,24 +1,11 @@
-const matches = require("../data/matches")
-const fs = require('fs');
-
-function matchesWon(object){
-let newObj={} 
-
-for(let key of object){
-    if(!newObj[key["season"]]){
-        newObj[key["season"]]={}
+function matchesWonPerTeam(matches) {
+  return matches.reduce((wins, match) => {
+    const { season, winner } = match;
+    if (winner != "") {
+      wins[season] = wins[season] || {};
+      wins[season][winner] = (wins[season][winner] || 0) + 1;
     }
-    if(!newObj[key["season"]][key["winner"]]){
-        if(key["winner"]=="")
-        continue
-        newObj[key["season"]][key["winner"]]=0
-    }
-    newObj[key["season"]][key["winner"]]++
-
+    return wins;
+  }, {});
 }
-return newObj;
-}
-fs.writeFileSync(
-    "../public/output/matchesWonPerYearPerTeam.json",
-    JSON.stringify(matchesWon(matches),null,2)
-  );
+module.exports.matchesWonPerTeam = matchesWonPerTeam;
